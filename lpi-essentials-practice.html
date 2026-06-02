@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LPI Linux Essentials 010 — Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0d10;
+  --bg2:#0f1419;
+  --panel:#121a20;
+  --panel2:#16202a;
+  --ink:#cdd6df;
+  --ink-dim:#8893a0;
+  --line:#26313c;
+  --acc:#e6b450;          /* amber UI accent */
+  --acc-dim:#8a6a22;
+  --acc-tint:rgba(230,180,80,.10);
+  --ok:#46d160;           /* GREEN = correct, reserved */
+  --ok-dim:#2c8a3e;
+  --no:#f8584f;           /* red = incorrect */
+  /* cool, non-green topic palette so green never appears decoratively */
+  --t1:#4cc4e0; --t2:#58a6ff; --t3:#c98bff; --t4:#ff9e64; --t5:#ff7b9c;
+  --mono:"IBM Plex Mono","Cascadia Code",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:"IBM Plex Sans",ui-sans-serif,system-ui,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(230,180,80,.05), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(88,166,255,.05), transparent 60%),
+    var(--bg);
+  color:var(--ink);
+  font-family:var(--sans);
+  line-height:1.55;
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:9;
+  background:repeating-linear-gradient(0deg, rgba(255,255,255,.016) 0 1px, transparent 1px 3px);
+  mix-blend-mode:overlay;opacity:.5;
+}
+.wrap{max-width:840px;margin:0 auto;padding:40px 20px 80px}
+
+header.masthead{
+  display:flex;align-items:center;gap:12px;margin-bottom:26px;
+  font-family:var(--mono);color:var(--ink-dim);font-size:13px;letter-spacing:.02em;
+}
+header.masthead .dot{width:11px;height:11px;border-radius:50%}
+.d1{background:#ff5f56}.d2{background:#ffbd2e}.d3{background:#27c93f}
+header.masthead .title{margin-left:6px;color:var(--ink)}
+header.masthead .title b{color:var(--acc)}
+header.masthead .right{margin-left:auto}
+
+.card{
+  background:linear-gradient(180deg,var(--panel),var(--bg2));
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:30px 30px 26px;
+  box-shadow:0 30px 60px -30px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.03);
+}
+
+.prompt{font-family:var(--mono);font-size:18px;margin-bottom:14px;word-break:break-word}
+.prompt .usr{color:var(--t1)} .prompt .sep{color:var(--ink-dim)}
+.prompt .dir{color:var(--acc)} .prompt .dollar{color:var(--ink-dim);margin:0 8px}
+.prompt .cmd{color:var(--ink)}
+.cursor{display:inline-block;width:9px;height:1.05em;background:var(--acc);margin-left:3px;
+  transform:translateY(2px);animation:blink 1.05s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+.lede{color:var(--ink-dim);font-size:14.5px;margin:0 0 22px}
+.lbl{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--acc-dim);margin:24px 0 12px;font-weight:600}
+
+.topics{display:flex;flex-direction:column;gap:8px}
+.topic{display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;
+  border:1px solid var(--line);border-radius:9px;padding:11px 14px;background:var(--panel2);
+  transition:border-color .15s,transform .08s,background .15s;font-size:14px}
+.topic:hover{border-color:#3a4956;transform:translateX(2px)}
+.topic.on{border-color:var(--acc-dim);background:var(--acc-tint)}
+.topic .chk{font-family:var(--mono);color:var(--acc);font-size:13px;width:26px}
+.topic .tnum{font-family:var(--mono);font-weight:700;font-size:13px}
+.topic .tname{flex:1;color:var(--ink)}
+.topic .tcount{font-family:var(--mono);color:var(--ink-dim);font-size:12px}
+.tcol1{color:var(--t1)}.tcol2{color:var(--t2)}.tcol3{color:var(--t3)}.tcol4{color:var(--t4)}.tcol5{color:var(--t5)}
+
+.topicbtns{display:flex;gap:10px;margin-top:10px}
+.mini{font-family:var(--mono);font-size:12px;background:transparent;border:1px solid var(--line);
+  color:var(--ink-dim);padding:5px 12px;border-radius:7px;cursor:pointer}
+.mini:hover{border-color:var(--acc-dim);color:var(--ink)}
+
+.segs{display:flex;gap:8px;flex-wrap:wrap}
+.seg{font-family:var(--mono);font-size:13.5px;background:var(--panel2);border:1px solid var(--line);
+  color:var(--ink);padding:10px 16px;border-radius:9px;cursor:pointer;transition:.15s}
+.seg:hover{border-color:#3a4956}
+.seg.on{background:var(--acc);color:#1a1305;border-color:var(--acc);font-weight:700}
+
+.meta{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  font-family:var(--mono);font-size:12.5px;color:var(--ink-dim);margin:20px 0 6px}
+.meta b{color:var(--ink)}
+.wgt.on{color:var(--acc)}
+
+.start{width:100%;margin-top:18px;font-family:var(--mono);font-size:16px;font-weight:700;
+  background:var(--acc);color:#1a1305;border:none;border-radius:11px;padding:15px;cursor:pointer;
+  transition:filter .15s,transform .08s}
+.start:hover:not(:disabled){filter:brightness(1.08)}
+.start:active:not(:disabled){transform:translateY(1px)}
+.start:disabled{background:#1c2730;color:var(--ink-dim);cursor:not-allowed}
+.hint{font-family:var(--mono);font-size:11.5px;color:var(--ink-dim);text-align:center;margin:14px 0 0}
+kbd{font-family:var(--mono);background:#1c2730;border:1px solid var(--line);border-bottom-width:2px;
+  border-radius:5px;padding:1px 6px;font-size:11px;color:var(--ink)}
+
+.topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:12.5px}
+.badge{border:1px solid var(--line);border-radius:20px;padding:4px 12px;color:var(--ink-dim);font-weight:600}
+.counter{margin-left:auto;color:var(--ink)} .counter .of,.score .of,.bsof{color:var(--ink-dim)}
+.score{color:var(--acc)}
+.timer{color:var(--ink-dim);min-width:48px;text-align:right}
+.bar{height:4px;background:#1a232c;border-radius:3px;margin:14px 0 22px;overflow:hidden}
+.bar span{display:block;height:100%;background:linear-gradient(90deg,var(--acc-dim),var(--acc));
+  transition:width .3s ease}
+
+.qtext{font-size:20px;font-weight:600;line-height:1.4;margin:0 0 20px;color:#e8eef4}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{position:relative;display:flex;align-items:flex-start;gap:13px;text-align:left;cursor:pointer;
+  background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:13px 40px 13px 15px;
+  color:var(--ink);font-family:var(--sans);font-size:15px;
+  transition:border-color .14s,background .14s,transform .07s,box-shadow .14s}
+.opt:hover:not(:disabled){border-color:var(--acc-dim);transform:translateX(3px)}
+.opt .letter{font-family:var(--mono);font-weight:700;color:var(--acc);min-width:18px}
+.opt .otext{flex:1}
+.opt:disabled{cursor:default}
+/* CORRECT — strong, unambiguous green with glow + check */
+.opt.correct{border:2px solid var(--ok);background:rgba(70,209,96,.16);
+  box-shadow:0 0 0 1px rgba(70,209,96,.35),0 0 22px -6px rgba(70,209,96,.5)}
+.opt.correct .letter{color:var(--ok)}
+.opt.correct::after{content:"\2713";position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  color:var(--ok);font-family:var(--mono);font-weight:700;font-size:16px}
+/* WRONG pick — red with cross */
+.opt.wrong{border:2px solid var(--no);background:rgba(248,88,79,.14)}
+.opt.wrong .letter{color:var(--no)}
+.opt.wrong::after{content:"\2717";position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  color:var(--no);font-family:var(--mono);font-weight:700;font-size:16px}
+.opt.dim{opacity:.45}
+
+.fb{margin-top:18px;border-left:3px solid var(--line);border-radius:8px;padding:13px 16px;
+  background:var(--panel2);animation:fade .25s ease}
+.fb.ok{border-left-color:var(--ok);background:rgba(70,209,96,.06)}
+.fb.no{border-left-color:var(--no);background:rgba(248,88,79,.06)}
+.fb .fbhead{font-family:var(--mono);font-size:13px;font-weight:700;margin-bottom:6px;letter-spacing:.04em}
+.fb.ok .fbhead{color:var(--ok)} .fb.no .fbhead{color:var(--no)}
+.fb .fbbody{font-size:14px;color:var(--ink)}
+
+.navrow{display:flex;gap:12px;margin-top:22px}
+.navrow.center{justify-content:center;flex-wrap:wrap}
+.ghost{font-family:var(--mono);font-size:13px;background:transparent;border:1px solid var(--line);
+  color:var(--ink-dim);padding:11px 18px;border-radius:10px;cursor:pointer;transition:.15s}
+.ghost:hover{border-color:var(--acc-dim);color:var(--ink)}
+.next{margin-left:auto;font-family:var(--mono);font-size:14px;font-weight:700;background:var(--acc);
+  color:#1a1305;border:none;border-radius:10px;padding:11px 22px;cursor:pointer;transition:filter .15s,transform .08s}
+.navrow.center .next{margin-left:0}
+.next:hover:not(:disabled){filter:brightness(1.08)}
+.next:disabled{background:#1c2730;color:var(--ink-dim);cursor:not-allowed}
+
+.results{text-align:center}
+.verdict{display:inline-block;font-family:var(--mono);font-weight:700;letter-spacing:.16em;font-size:13px;
+  padding:6px 16px;border-radius:20px;margin-bottom:10px}
+.verdict.pass{color:#06140b;background:var(--ok)}
+.verdict.fail{color:#1a0c0a;background:var(--no)}
+.bigscore{font-family:var(--mono);font-size:68px;font-weight:700;line-height:1;color:#e8eef4;margin:6px 0}
+.acc{font-family:var(--mono);font-size:13.5px;color:var(--ink-dim);margin-bottom:8px}
+.topicbreak{display:flex;flex-direction:column;gap:11px;text-align:left;margin-bottom:6px}
+.trow{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:12.5px}
+.tlab{min-width:200px}
+.tbar{flex:1;height:8px;background:#1a232c;border-radius:5px;overflow:hidden}
+.tfill{display:block;height:100%;border-radius:5px;transition:width .5s ease}
+.tcol1bg{background:var(--t1)}.tcol2bg{background:var(--t2)}.tcol3bg{background:var(--t3)}
+.tcol4bg{background:var(--t4)}.tcol5bg{background:var(--t5)}
+.tval{min-width:44px;text-align:right;color:var(--ink)}
+
+.rlist{display:flex;flex-direction:column;gap:14px;margin:18px 0}
+.rcard{border:1px solid var(--line);border-radius:11px;padding:15px 16px;background:var(--panel2)}
+.rcard.isw{border-left:3px solid var(--no)} .rcard.isok{border-left:3px solid var(--ok)}
+.rhead{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.rhead .rmark{font-family:var(--mono);font-weight:700}
+.rcard.isw .rmark{color:var(--no)} .rcard.isok .rmark{color:var(--ok)}
+.rhead .rq{font-weight:600;color:#e8eef4;font-size:15px}
+.ropts{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.ropt{display:flex;gap:10px;font-size:14px;color:var(--ink-dim);padding:7px 11px;border-radius:7px;border:1px solid transparent}
+.ropt .letter{font-family:var(--mono);font-weight:700;min-width:16px}
+.ropt.rcorrect{color:var(--ink);background:rgba(70,209,96,.12);border-color:var(--ok-dim)}
+.ropt.rcorrect .letter{color:var(--ok)}
+.ropt.rwrong{color:var(--ink);background:rgba(248,88,79,.12);border-color:var(--no)}
+.ropt.rwrong .letter{color:var(--no)}
+.rexp{font-family:var(--mono);font-size:12.5px;color:var(--ink-dim);border-top:1px dashed var(--line);padding-top:9px}
+.empty{text-align:center;color:var(--ink-dim);font-family:var(--mono)}
+
+.reveal{animation:rise .4s cubic-bezier(.2,.7,.2,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+
+footer.foot{text-align:center;font-family:var(--mono);font-size:11px;color:#56616c;margin-top:26px;line-height:1.7}
+footer.foot a{color:var(--acc-dim);text-decoration:none}
+footer.foot a:hover{color:var(--acc);text-decoration:underline}
+footer.foot .attr{display:block;margin-top:6px;max-width:560px;margin-left:auto;margin-right:auto}
+
+@media (max-width:560px){
+  .card{padding:22px 18px}
+  .qtext{font-size:18px}
+  .bigscore{font-size:54px}
+  .tlab{min-width:120px}
+  .next{padding:11px 16px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="masthead">
+    <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>
+    <span class="title"><b>lpi-essentials</b> — practice (010-160)</span>
+    <span class="right">instant feedback</span>
+  </header>
+  <main id="app"></main>
+  <footer class="foot">190-question bank · randomized each run · offline-ready single file
+    <span class="attr">Questions based on the <a href="https://learning.lpi.org/en/learning-materials/010-160/" target="_blank" rel="noopener">LPI Linux Essentials (010-160) v1.6 learning materials</a>, licensed <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="noopener">CC BY-NC-ND 4.0</a>. This is an independent study aid, not affiliated with or endorsed by the Linux Professional Institute.</span>
+  </footer>
+</div>
+<script>
+const QUESTIONS = [{"t": 1, "q": "Who originally created the Linux kernel in 1991?", "o": ["Richard Stallman", "Linus Torvalds", "Ken Thompson", "Andrew Tanenbaum"], "c": 1, "e": "Linus Torvalds released the first Linux kernel in 1991. Stallman founded the GNU project/FSF; Thompson co-created UNIX."}, {"t": 1, "q": "Which of the following is a Debian-based Linux distribution?", "o": ["CentOS", "Fedora", "Ubuntu", "openSUSE"], "c": 2, "e": "Ubuntu is derived from Debian and uses .deb packages with apt. CentOS/Fedora are RPM-based; openSUSE is its own RPM family."}, {"t": 1, "q": "Which distribution family uses the RPM package format and the yum/dnf tools?", "o": ["Debian", "Ubuntu", "Linux Mint", "Red Hat / CentOS"], "c": 3, "e": "Red Hat, CentOS and Fedora use RPM packages managed by yum or dnf. Debian, Ubuntu and Mint use .deb/apt."}, {"t": 1, "q": "The Android operating system is built on top of which kernel?", "o": ["The BSD kernel", "The Linux kernel", "The Windows NT kernel", "The Mach kernel"], "c": 1, "e": "Android uses a modified Linux kernel, which is why it is considered part of the broader Linux ecosystem."}, {"t": 1, "q": "Which of these is best described as a 'rolling release' distribution?", "o": ["Debian Stable", "Arch Linux", "Red Hat Enterprise Linux", "Ubuntu LTS"], "c": 1, "e": "Arch Linux uses a rolling release model with continuous updates rather than fixed versioned releases."}, {"t": 1, "q": "In a shell prompt, which symbol typically indicates that you are logged in as the root (superuser) account?", "o": ["$", "#", "%", ">"], "c": 1, "e": "By convention a '#' prompt indicates the root user, while '$' indicates a normal/unprivileged user."}, {"t": 1, "q": "Which of the following is a popular open source relational database server?", "o": ["GIMP", "MariaDB", "Thunderbird", "Blender"], "c": 1, "e": "MariaDB (a MySQL fork) is an open source relational database. GIMP edits images, Thunderbird is a mail client, Blender does 3D."}, {"t": 1, "q": "Which application is an open source email client (Mail User Agent), not a server?", "o": ["Postfix", "Sendmail", "Thunderbird", "Dovecot"], "c": 2, "e": "Thunderbird is a desktop email client. Postfix/Sendmail are mail transfer agents (servers); Dovecot is an IMAP/POP server."}, {"t": 1, "q": "Which two programs are widely used open source web servers?", "o": ["MySQL and MariaDB", "Apache HTTPD and NGINX", "Firefox and Chromium", "Samba and NFS"], "c": 1, "e": "Apache HTTPD and NGINX are the dominant open source web servers."}, {"t": 1, "q": "Which open source application is primarily used for raster image editing?", "o": ["LibreOffice Writer", "GIMP", "Audacity", "Inkscape"], "c": 1, "e": "GIMP is the GNU Image Manipulation Program for raster images. Inkscape is vector; Audacity is audio; Writer is a word processor."}, {"t": 1, "q": "Samba is most commonly used to provide which type of service?", "o": ["DNS name resolution", "File and print sharing compatible with Windows (SMB/CIFS)", "Web hosting", "Email delivery"], "c": 1, "e": "Samba implements the SMB/CIFS protocol, allowing Linux to share files and printers with Windows clients."}, {"t": 1, "q": "Which license is the classic example of a strong copyleft license?", "o": ["MIT License", "BSD License", "GNU GPL", "Apache License"], "c": 2, "e": "The GNU General Public License (GPL) is the canonical copyleft license: derivative works must be released under the same terms."}, {"t": 1, "q": "Which term describes licenses such as BSD and MIT that impose few restrictions on redistribution?", "o": ["Copyleft", "Permissive", "Proprietary", "Public domain"], "c": 1, "e": "BSD and MIT are 'permissive' licenses; they allow reuse, including in closed-source products, with minimal conditions."}, {"t": 1, "q": "Who founded the Free Software Foundation and authored the GNU General Public License?", "o": ["Linus Torvalds", "Richard Stallman", "Eric Raymond", "Bruce Perens"], "c": 1, "e": "Richard Stallman founded the FSF, launched the GNU project, and wrote the GPL."}, {"t": 1, "q": "In the phrase 'free software', the word 'free' most accurately refers to:", "o": ["Free of monetary cost", "Freedom to run, study, modify and share the software", "Software with no warranty", "Software in the public domain"], "c": 1, "e": "Free software is about freedom (libre), not price. You may be charged for free software but retain the four freedoms."}, {"t": 1, "q": "Which organization maintains the Open Source Definition and approves open source licenses?", "o": ["Free Software Foundation (FSF)", "Open Source Initiative (OSI)", "Linux Foundation", "Apache Software Foundation"], "c": 1, "e": "The Open Source Initiative (OSI) maintains the Open Source Definition and certifies licenses as 'open source'."}, {"t": 1, "q": "Creative Commons licenses are typically used for what kind of work?", "o": ["Kernel source code", "Creative content such as documents, images and music", "Firmware", "Device drivers"], "c": 1, "e": "Creative Commons licenses are designed for creative/cultural works (text, images, audio), not primarily for software code."}, {"t": 1, "q": "What does the acronym FLOSS stand for?", "o": ["Free/Libre and Open Source Software", "Fast Lightweight Open Source System", "Free License Open Source Standard", "Foundation for Libre Open Source Software"], "c": 0, "e": "FLOSS = Free/Libre and Open Source Software, a neutral umbrella term covering both 'free software' and 'open source'."}, {"t": 1, "q": "Which of the following is an example of open source software being used on an embedded system?", "o": ["A spreadsheet on a laptop", "OpenWrt running on a home router", "A word processor on a desktop", "A cloud billing dashboard"], "c": 1, "e": "OpenWrt is a Linux-based firmware for embedded devices such as routers — a classic embedded use case."}, {"t": 1, "q": "Which scripting/programming language is interpreted and very commonly used for Linux automation and is named after a comedy troupe?", "o": ["Java", "Python", "Rust", "C"], "c": 1, "e": "Python is a widely used interpreted language for scripting and automation on Linux."}, {"t": 1, "q": "A user wants a free, open source alternative to Microsoft Office. Which should they choose?", "o": ["LibreOffice", "Adobe Acrobat", "Google Chrome", "VLC"], "c": 0, "e": "LibreOffice is the leading open source office suite (Writer, Calc, Impress, etc.)."}, {"t": 1, "q": "Which statement about cloud computing is correct?", "o": ["Cloud services never use Linux", "Linux is widely used to run servers and services in the cloud", "Cloud means software stored only on local disks", "Cloud computing eliminates the need for networking"], "c": 1, "e": "Linux dominates cloud server workloads (e.g., most public-cloud instances and containers run Linux)."}, {"t": 1, "q": "Which of the following is a privacy best practice when using web services?", "o": ["Reuse the same simple password everywhere", "Prefer encrypted connections (HTTPS) and use strong, unique passwords", "Disable all software updates", "Share credentials over plain email"], "c": 1, "e": "Using HTTPS and strong, unique passwords (ideally with a password manager) protects privacy and accounts."}, {"t": 1, "q": "Which protocol provides the encryption behind a secure 'https://' web connection?", "o": ["FTP", "TLS/SSL", "Telnet", "SMTP"], "c": 1, "e": "HTTPS relies on TLS (historically SSL) to encrypt traffic between browser and server."}, {"t": 1, "q": "Which of the following best distinguishes a desktop application from a server application?", "o": ["Desktop apps cannot be open source", "Desktop apps run for an interactive local user; server apps provide services to clients over a network", "Server apps always have a GUI", "There is no difference"], "c": 1, "e": "Desktop applications serve the interactive local user; server applications provide services (web, mail, files) to remote clients."}, {"t": 1, "q": "Which of the following is an open source web browser?", "o": ["Safari", "Microsoft Edge (legacy)", "Firefox", "Internet Explorer"], "c": 2, "e": "Mozilla Firefox is open source. Safari and Internet Explorer/legacy Edge are proprietary."}, {"t": 1, "q": "Blender is an open source application used primarily for:", "o": ["Spreadsheet calculations", "3D modeling, animation and rendering", "Email management", "Database administration"], "c": 1, "e": "Blender is a 3D creation suite for modeling, animation, and rendering."}, {"t": 1, "q": "What is a distribution (distro) in the Linux world?", "o": ["The Linux kernel by itself", "A complete OS bundling the kernel with software, package management and tools", "A type of file system", "A licensing model"], "c": 1, "e": "A distribution packages the kernel together with system tools, libraries, package management and applications into a usable OS."}, {"t": 1, "q": "Which of these is an open source media player capable of playing many audio and video formats?", "o": ["VLC", "Notepad", "PuTTY", "WinRAR"], "c": 0, "e": "VLC media player is open source and supports a very wide range of formats."}, {"t": 1, "q": "Which statement about the GPL's copyleft requirement is correct?", "o": ["You may relicense GPL code as proprietary freely", "Derivative works distributed to others must also be licensed under the GPL", "GPL forbids any commercial use", "GPL applies only to documentation"], "c": 1, "e": "Copyleft means derivatives you distribute must carry the same (GPL) license, keeping the code free."}, {"t": 1, "q": "Which of the following pairs an open source server with the correct purpose?", "o": ["NGINX – database server", "Postfix – mail transfer agent", "MariaDB – web server", "Samba – DNS server"], "c": 1, "e": "Postfix is a Mail Transfer Agent (MTA). NGINX is a web server, MariaDB a database, Samba a file/print server."}, {"t": 1, "q": "Raspberry Pi OS is an example of:", "o": ["A proprietary mainframe OS", "A Debian-based Linux distribution for a single-board computer", "A cloud-only operating system", "A Windows variant"], "c": 1, "e": "Raspberry Pi OS (formerly Raspbian) is Debian-based, targeting the Raspberry Pi single-board computer."}, {"t": 2, "q": "Which command prints the full path of the current working directory?", "o": ["cd", "ls", "pwd", "dir"], "c": 2, "e": "pwd = print working directory. cd changes directory; ls lists contents."}, {"t": 2, "q": "Which command changes the current directory to the user's home directory when run with no arguments?", "o": ["cd", "home", "chdir ~", "go"], "c": 0, "e": "Running 'cd' with no argument returns you to your home directory (equivalent to 'cd ~')."}, {"t": 2, "q": "Which symbol represents the current user's home directory in the shell?", "o": [".", "..", "~", "/"], "c": 2, "e": "The tilde (~) expands to the current user's home directory. '.' is current dir, '..' is parent, '/' is root."}, {"t": 2, "q": "What does '..' refer to in a path?", "o": ["The current directory", "The parent directory", "The root directory", "The home directory"], "c": 1, "e": "'..' is the parent directory; '.' is the current directory."}, {"t": 2, "q": "Which command lists directory contents including hidden files (those beginning with a dot)?", "o": ["ls -l", "ls -a", "ls -R", "ls -t"], "c": 1, "e": "ls -a shows all entries including hidden dotfiles. -l is long format, -R recursive, -t sort by time."}, {"t": 2, "q": "Which ls option shows a long listing with permissions, owner, size and modification time?", "o": ["-a", "-l", "-h", "-d"], "c": 1, "e": "ls -l produces the long format. -h adds human-readable sizes (often combined as -lh)."}, {"t": 2, "q": "An absolute path is one that:", "o": ["Starts from the current directory", "Begins at the root directory with a leading /", "Always contains ~", "Cannot contain subdirectories"], "c": 1, "e": "An absolute path begins at root (/). A relative path is interpreted from the current working directory."}, {"t": 2, "q": "Which command displays the contents of a text file to standard output?", "o": ["touch", "cat", "mkdir", "rm"], "c": 1, "e": "cat concatenates and prints file contents. touch creates/updates timestamps; mkdir makes directories."}, {"t": 2, "q": "Which command creates a new empty file or updates the timestamp of an existing one?", "o": ["mkfile", "touch", "new", "create"], "c": 1, "e": "touch updates access/modification times and creates the file if it does not exist."}, {"t": 2, "q": "Which command creates a new directory?", "o": ["mkdir", "rmdir", "newdir", "cd"], "c": 0, "e": "mkdir makes a directory; rmdir removes an empty directory."}, {"t": 2, "q": "Which command and option recursively copies a directory and its contents?", "o": ["cp -r", "cp -l", "mv -r", "cp -a only works on files"], "c": 0, "e": "cp -r (or -R) copies directories recursively."}, {"t": 2, "q": "Which command moves or renames a file?", "o": ["mv", "cp", "ln", "rn"], "c": 0, "e": "mv moves or renames. There is no separate 'rename' core command in this objective set."}, {"t": 2, "q": "Which command removes (deletes) a file?", "o": ["del", "rm", "erase", "unlink-dir"], "c": 1, "e": "rm removes files. Use rm -r to remove directories recursively (carefully)."}, {"t": 2, "q": "Which rmdir behavior is correct?", "o": ["It deletes directories even if they contain files", "It only removes empty directories", "It is the same as rm -rf", "It renames directories"], "c": 1, "e": "rmdir only removes empty directories; to remove a non-empty directory use rm -r."}, {"t": 2, "q": "Which command displays the manual page for a command?", "o": ["help", "man", "info only", "manual"], "c": 1, "e": "man <command> shows the manual page. info is an alternative GNU help system."}, {"t": 2, "q": "In manual pages, which section number traditionally documents user commands/executables?", "o": ["Section 1", "Section 5", "Section 8", "Section 3"], "c": 0, "e": "Section 1 = user commands. Section 5 = file formats, Section 8 = system administration commands, Section 3 = library calls."}, {"t": 2, "q": "Which command searches the manual page names and short descriptions for a keyword?", "o": ["whatis", "apropos", "locate", "find"], "c": 1, "e": "apropos <keyword> searches man page descriptions. whatis gives a one-line description of a known command."}, {"t": 2, "q": "Which command gives a one-line description of what a command does, from the manual database?", "o": ["apropos", "whatis", "type", "file"], "c": 1, "e": "whatis <command> prints the short man-page description. apropos does keyword searching."}, {"t": 2, "q": "For many GNU commands, which option displays a brief usage/help summary?", "o": ["-v", "--help", "-q", "--man"], "c": 1, "e": "--help is the conventional GNU option for a quick usage summary."}, {"t": 2, "q": "Which environment variable lists the directories the shell searches for executable commands?", "o": ["HOME", "PATH", "SHELL", "PWD"], "c": 1, "e": "PATH is a colon-separated list of directories searched for commands."}, {"t": 2, "q": "Which command shows the value of a shell/environment variable, e.g. echo $HOME?", "o": ["echo", "print", "show", "cat"], "c": 0, "e": "echo prints text and variable expansions, e.g. 'echo $HOME'."}, {"t": 2, "q": "Which command displays the command history of the current shell?", "o": ["log", "history", "last", "recall"], "c": 1, "e": "history lists previously entered commands in the shell session."}, {"t": 2, "q": "What is the effect of pressing the Tab key while typing a command or filename in Bash?", "o": ["It clears the line", "It attempts auto-completion", "It runs the command", "It opens the manual"], "c": 1, "e": "Tab triggers command/filename completion in Bash."}, {"t": 2, "q": "Which command displays the type of a command (alias, builtin, file) and its location?", "o": ["which only", "type", "where", "info"], "c": 1, "e": "type tells you whether a name is a builtin, alias, function, or external file (and where)."}, {"t": 2, "q": "In a long listing, the first character of 'drwxr-xr-x' indicates that the item is a:", "o": ["Regular file", "Directory", "Symbolic link", "Socket"], "c": 1, "e": "A leading 'd' indicates a directory. '-' is a regular file, 'l' a symbolic link."}, {"t": 2, "q": "Which command would you use to view a long file one screen at a time, allowing scrolling?", "o": ["cat", "less", "touch", "echo"], "c": 1, "e": "less is a pager that lets you scroll forward and backward through output/files."}, {"t": 2, "q": "Which wildcard matches any single character in a filename glob?", "o": ["*", "?", "[ ]", "%"], "c": 1, "e": "? matches exactly one character; * matches any number (including zero) of characters."}, {"t": 2, "q": "Which glob pattern matches all files ending in '.txt' in the current directory?", "o": ["?.txt", "*.txt", "txt.*", "[txt]"], "c": 1, "e": "*.txt matches any name ending in .txt because * matches any sequence of characters."}, {"t": 2, "q": "What does the command 'cd -' do?", "o": ["Goes to the root directory", "Returns to the previous working directory", "Goes up one directory", "Creates a directory named -"], "c": 1, "e": "cd - switches back to the previous working directory (stored in OLDPWD)."}, {"t": 2, "q": "Which command clears the terminal screen?", "o": ["wipe", "clear", "reset-all", "cls"], "c": 1, "e": "clear clears the visible terminal screen. (cls is the DOS/Windows equivalent.)"}, {"t": 2, "q": "Which option lets cp prompt before overwriting an existing file?", "o": ["cp -f", "cp -i", "cp -r", "cp -u"], "c": 1, "e": "cp -i is interactive and prompts before overwrite. -f forces, -r recurses, -u copies only when newer."}, {"t": 2, "q": "Which statement about the 'ls -ld directoryname' command is correct?", "o": ["It lists the directory's contents in long form", "It shows the directory's own attributes rather than its contents", "It deletes the directory", "It changes into the directory"], "c": 1, "e": "The -d option makes ls show the directory entry itself, not its contents; -l adds long format."}, {"t": 2, "q": "Which command would show only the directories' names and contents recursively?", "o": ["ls -a", "ls -R", "ls -t", "ls -S"], "c": 1, "e": "ls -R recurses into subdirectories. -t sorts by time, -S by size, -a shows hidden files."}, {"t": 2, "q": "In Bash, what does the up arrow key do by default?", "o": ["Deletes the previous command", "Recalls the previous command from history", "Logs out", "Switches users"], "c": 1, "e": "The up arrow scrolls back through command history; the down arrow goes forward."}, {"t": 2, "q": "Which command shows which executable file will run for a given command name (first match in PATH)?", "o": ["which", "whatis", "apropos", "file"], "c": 0, "e": "which locates the executable that would be run for a command, searching PATH."}, {"t": 2, "q": "Which path is relative (interpreted from the current directory)?", "o": ["/etc/passwd", "~/file", "docs/report.txt", "/home/user"], "c": 2, "e": "docs/report.txt has no leading / and no ~, so it is interpreted relative to the current directory."}, {"t": 2, "q": "Which command creates several nested directories at once, creating parents as needed?", "o": ["mkdir -p a/b/c", "mkdir a b c", "mkdir -r a/b/c", "mkdir --nested"], "c": 0, "e": "mkdir -p creates the full path, making intermediate parent directories as required."}, {"t": 2, "q": "What does the 'q' key typically do inside the 'less' pager or a man page?", "o": ["Quits the pager", "Searches forward", "Goes to the next file", "Quotes a line"], "c": 0, "e": "Pressing q quits less / the man pager."}, {"t": 2, "q": "Which command is the GNU hypertext documentation reader, an alternative to man?", "o": ["info", "docs", "readme", "helpdoc"], "c": 0, "e": "info reads GNU Info documents, which are often more detailed than man pages."}, {"t": 3, "q": "Which is the most common command-line tool for creating archives on Linux?", "o": ["zip", "tar", "gzip", "cpio"], "c": 1, "e": "tar (tape archive) is the standard Linux archiving tool; it bundles many files into one archive."}, {"t": 3, "q": "Which single tar command creates a gzip-compressed archive named backup.tar.gz from a directory?", "o": ["tar -xzf backup.tar.gz dir", "tar -czf backup.tar.gz dir", "tar -tzf backup.tar.gz dir", "tar -rf backup.tar.gz dir"], "c": 1, "e": "-c create, -z gzip, -f file. -x extracts, -t lists, -r appends."}, {"t": 3, "q": "In tar options, what does the 'x' do?", "o": ["Creates an archive", "Extracts files from an archive", "Lists archive contents", "Compresses with xz"], "c": 1, "e": "x = extract. c = create, t = list. (xz compression is enabled with -J, not x.)"}, {"t": 3, "q": "Which tar option lists the contents of an archive without extracting them?", "o": ["-c", "-t", "-x", "-u"], "c": 1, "e": "-t lists the table of contents of the archive."}, {"t": 3, "q": "Which tar option specifies the archive file name?", "o": ["-f", "-v", "-z", "-c"], "c": 0, "e": "-f <name> names the archive file. -v is verbose, -z is gzip, -c is create."}, {"t": 3, "q": "Which standalone compression tool produces files with a '.gz' extension?", "o": ["bzip2", "xz", "gzip", "zip"], "c": 2, "e": "gzip produces .gz files. bzip2 -> .bz2, xz -> .xz, zip -> .zip."}, {"t": 3, "q": "Which compression tool generally achieves higher compression ratios and uses the '.xz' extension?", "o": ["gzip", "bzip2", "xz", "zip"], "c": 2, "e": "xz typically compresses more (at the cost of speed) and produces .xz files."}, {"t": 3, "q": "Which command decompresses a file named data.gz, restoring data?", "o": ["gzip data.gz", "gunzip data.gz", "tar -x data.gz", "unzip data.gz"], "c": 1, "e": "gunzip (or gzip -d) decompresses .gz files. unzip handles .zip archives."}, {"t": 3, "q": "Which tar option enables bzip2 compression?", "o": ["-z", "-j", "-J", "-a"], "c": 1, "e": "-j = bzip2, -z = gzip, -J = xz. -a auto-detects from the file name."}, {"t": 3, "q": "Unlike tar, the 'zip' utility differs in that it:", "o": ["Cannot compress at all", "Both archives and compresses files together, and is common on Windows", "Only works on directories", "Requires root privileges"], "c": 1, "e": "zip combines archiving and compression in one format and is widely interoperable with Windows."}, {"t": 3, "q": "Which command searches files line by line for a pattern and prints matching lines?", "o": ["sed", "grep", "awk", "find"], "c": 1, "e": "grep searches input for lines matching a pattern/regular expression."}, {"t": 3, "q": "Which grep option makes the search case-insensitive?", "o": ["-v", "-i", "-n", "-c"], "c": 1, "e": "-i ignores case. -v inverts the match, -n shows line numbers, -c counts matches."}, {"t": 3, "q": "Which grep option inverts the match, printing lines that do NOT contain the pattern?", "o": ["-i", "-v", "-l", "-r"], "c": 1, "e": "-v selects non-matching lines."}, {"t": 3, "q": "Which grep option recursively searches all files under a directory?", "o": ["-r", "-n", "-w", "-x"], "c": 0, "e": "-r (or -R) searches directories recursively."}, {"t": 3, "q": "Which command displays the first lines of a file (10 by default)?", "o": ["tail", "head", "more", "cat"], "c": 1, "e": "head shows the beginning of a file; tail shows the end."}, {"t": 3, "q": "Which command displays the last lines of a file and can follow new content as it is appended?", "o": ["head", "tail", "less", "cut"], "c": 1, "e": "tail shows the end; tail -f follows a growing file such as a log."}, {"t": 3, "q": "Which option makes 'tail' continuously output new lines appended to a file (useful for logs)?", "o": ["-n", "-f", "-c", "-q"], "c": 1, "e": "tail -f follows the file, printing new lines as they arrive."}, {"t": 3, "q": "Which command counts lines, words and bytes in its input?", "o": ["wc", "nl", "cut", "sort"], "c": 0, "e": "wc prints line, word and byte counts; wc -l counts only lines."}, {"t": 3, "q": "Which wc option prints only the number of lines?", "o": ["-w", "-l", "-c", "-m"], "c": 1, "e": "-l counts lines, -w words, -c bytes, -m characters."}, {"t": 3, "q": "Which command sorts lines of text alphabetically by default?", "o": ["sort", "uniq", "order", "cut"], "c": 0, "e": "sort orders lines; sort -n sorts numerically, -r reverses."}, {"t": 3, "q": "Which sort option performs a numeric sort instead of lexical?", "o": ["-r", "-n", "-u", "-f"], "c": 1, "e": "-n sorts by numeric value. -r reverses, -u outputs unique, -f folds case."}, {"t": 3, "q": "Which command removes adjacent duplicate lines from sorted input?", "o": ["sort", "uniq", "dedup", "cut"], "c": 1, "e": "uniq collapses adjacent duplicate lines; input is usually sorted first."}, {"t": 3, "q": "Which command extracts specific columns or fields from each line of input?", "o": ["cut", "paste", "join", "tr"], "c": 0, "e": "cut selects fields (-f) or character ranges (-c) from lines."}, {"t": 3, "q": "Which cut command extracts the first field of a colon-delimited file like /etc/passwd?", "o": ["cut -c1 file", "cut -d: -f1 file", "cut -f: -d1 file", "cut -1 file"], "c": 1, "e": "-d sets the delimiter (:), -f selects the field number (1)."}, {"t": 3, "q": "The pipe symbol '|' on the command line is used to:", "o": ["Redirect output to a file", "Send the output of one command as input to another", "Run a command in the background", "Comment out a line"], "c": 1, "e": "A pipe connects stdout of one command to stdin of the next, e.g. 'ls | sort'."}, {"t": 3, "q": "Which operator redirects a command's standard output to a file, overwriting it?", "o": [">", ">>", "<", "|"], "c": 0, "e": "> redirects stdout to a file, truncating it. >> appends; < redirects input."}, {"t": 3, "q": "Which operator appends standard output to a file without overwriting existing content?", "o": [">", ">>", "<", "2>"], "c": 1, "e": ">> appends to the target file."}, {"t": 3, "q": "Which operator redirects standard error (stderr) specifically?", "o": ["2>", ">", "<", "1>"], "c": 0, "e": "2> redirects file descriptor 2 (stderr). 1> (or >) redirects stdout."}, {"t": 3, "q": "What does '< file' do for a command?", "o": ["Sends the command's output to file", "Provides file as the command's standard input", "Appends to file", "Deletes file"], "c": 1, "e": "< redirects standard input to come from the named file."}, {"t": 3, "q": "Which line at the very top of a script declares the interpreter (e.g., #!/bin/bash)?", "o": ["A comment only", "The shebang", "A here-document", "The shell prompt"], "c": 1, "e": "The 'shebang' (#!) line tells the system which interpreter should run the script."}, {"t": 3, "q": "What must be true for a script file to be run directly as ./script.sh?", "o": ["It must be owned by root", "It must have the execute permission set", "It must end in .sh", "It must be in /bin"], "c": 1, "e": "The file needs execute permission (e.g., chmod +x script.sh) to run directly."}, {"t": 3, "q": "Inside a shell script, how do you write a comment?", "o": ["Lines beginning with //", "Lines beginning with #", "Lines beginning with --", "Lines wrapped in /* */"], "c": 1, "e": "In shell scripts, a # begins a comment to the end of the line (except in the shebang)."}, {"t": 3, "q": "Which variable inside a script holds the first command-line argument passed to it?", "o": ["$0", "$1", "$#", "$@"], "c": 1, "e": "$1 is the first argument; $0 is the script name, $# the count, $@ all arguments."}, {"t": 3, "q": "Which special variable contains the exit status of the most recently run command?", "o": ["$!", "$?", "$$", "$*"], "c": 1, "e": "$? holds the exit status of the last command (0 = success)."}, {"t": 3, "q": "By convention, what exit status does a successful command return?", "o": ["1", "0", "-1", "255"], "c": 1, "e": "An exit status of 0 means success; non-zero indicates an error."}, {"t": 3, "q": "Which construct repeats commands for each item in a list in Bash?", "o": ["if ... fi", "for ... do ... done", "case ... esac", "while only"], "c": 1, "e": "A for loop iterates over a list: 'for x in a b c; do ... ; done'."}, {"t": 3, "q": "Which keyword closes an 'if' block in Bash?", "o": ["end", "endif", "fi", "done"], "c": 2, "e": "An if statement ends with 'fi' (if spelled backwards). Loops end with 'done'."}, {"t": 3, "q": "How are variables assigned in Bash (correct syntax)?", "o": ["var = value", "var=value", "set var value", "$var = value"], "c": 1, "e": "Assignment uses no spaces around '=': var=value. You reference it as $var."}, {"t": 3, "q": "Which command can read a line of input from the user into a variable inside a script?", "o": ["echo", "read", "input", "scan"], "c": 1, "e": "read VAR stores a line of user input into VAR."}, {"t": 3, "q": "What does the 'tee' command do in a pipeline?", "o": ["Sorts input", "Writes input to a file and also passes it to standard output", "Deletes duplicate lines", "Compresses data"], "c": 1, "e": "tee splits the stream: it writes to a file while also forwarding output downstream."}, {"t": 3, "q": "Which command translates or deletes characters, e.g. converting lowercase to uppercase?", "o": ["tr", "cut", "sed", "paste"], "c": 0, "e": "tr translates/deletes characters, e.g. 'tr a-z A-Z'."}, {"t": 3, "q": "Which tool is a stream editor often used for find-and-replace on text streams?", "o": ["awk", "sed", "grep", "cut"], "c": 1, "e": "sed is the stream editor; 's/old/new/' performs substitution."}, {"t": 3, "q": "In a pipeline 'cat file | grep error | wc -l', what is produced?", "o": ["The whole file", "A count of lines containing 'error'", "The first error line", "The file sorted"], "c": 1, "e": "grep filters lines containing 'error' and wc -l counts them."}, {"t": 4, "q": "Which directory is the top of the Linux file system hierarchy?", "o": ["/root", "/", "/home", "/boot"], "c": 1, "e": "The root directory '/' is the single top of the unified Linux directory tree."}, {"t": 4, "q": "Which directory traditionally contains the home directories of normal users?", "o": ["/root", "/home", "/usr", "/var"], "c": 1, "e": "/home holds users' personal directories. /root is specifically the superuser's home."}, {"t": 4, "q": "Which directory contains the kernel and files needed to boot the system?", "o": ["/bin", "/boot", "/etc", "/dev"], "c": 1, "e": "/boot contains the kernel image, initramfs, and bootloader files."}, {"t": 4, "q": "Which directory contains system-wide configuration files?", "o": ["/etc", "/var", "/proc", "/lib"], "c": 0, "e": "/etc holds system configuration files such as /etc/passwd and /etc/fstab."}, {"t": 4, "q": "Which special directory presents kernel and process information as virtual files?", "o": ["/dev", "/proc", "/srv", "/opt"], "c": 1, "e": "/proc is a virtual filesystem exposing process and kernel data (e.g., /proc/cpuinfo)."}, {"t": 4, "q": "Which directory contains device files representing hardware (e.g., disks, terminals)?", "o": ["/dev", "/sys", "/mnt", "/tmp"], "c": 0, "e": "/dev holds device nodes like /dev/sda and /dev/tty."}, {"t": 4, "q": "Which directory typically holds variable data such as logs and mail spools?", "o": ["/usr", "/var", "/etc", "/lib"], "c": 1, "e": "/var stores variable data: logs (/var/log), spools, caches, etc."}, {"t": 4, "q": "Where are most system log files generally stored?", "o": ["/etc/log", "/var/log", "/log", "/proc/log"], "c": 1, "e": "/var/log is the standard location for log files."}, {"t": 4, "q": "In modern Linux, which device name usually refers to the first SATA/SAS/USB disk?", "o": ["/dev/hda", "/dev/sda", "/dev/fd0", "/dev/disk0"], "c": 1, "e": "Modern Linux uses /dev/sda for the first disk via the libata/SCSI layer; /dev/hda was the legacy IDE name."}, {"t": 4, "q": "Which device name represents the second partition on the first such disk?", "o": ["/dev/sda1", "/dev/sda2", "/dev/sdb2", "/dev/sd2"], "c": 1, "e": "/dev/sda2 is the second partition of the first disk; the trailing number is the partition."}, {"t": 4, "q": "An NVMe solid-state drive's first namespace, second partition, is typically named:", "o": ["/dev/sda2", "/dev/nvme0n1p2", "/dev/nvme2", "/dev/ssd0p2"], "c": 1, "e": "NVMe devices use the /dev/nvmeXnYpZ scheme: nvme0n1p2 = controller 0, namespace 1, partition 2."}, {"t": 4, "q": "Which command displays current memory usage (free and used RAM)?", "o": ["df", "free", "du", "top only"], "c": 1, "e": "free reports memory and swap usage. df reports disk space; du reports directory sizes."}, {"t": 4, "q": "Which command reports file system disk space usage by mounted file system?", "o": ["du", "df", "free", "lsblk"], "c": 1, "e": "df shows free/used space per mounted filesystem (df -h for human-readable)."}, {"t": 4, "q": "Which command estimates the disk space used by files and directories?", "o": ["df", "du", "free", "fdisk"], "c": 1, "e": "du summarizes disk usage of files/directories (e.g., du -sh dir)."}, {"t": 4, "q": "Which command lists block devices such as disks and their partitions in a tree?", "o": ["lsblk", "lspci", "lsusb", "lscpu"], "c": 0, "e": "lsblk lists block devices. lspci lists PCI devices, lsusb USB, lscpu CPU info."}, {"t": 4, "q": "Which command lists the PCI devices present in the system?", "o": ["lsusb", "lspci", "lsblk", "lsmod"], "c": 1, "e": "lspci lists devices on the PCI bus (e.g., network and graphics controllers)."}, {"t": 4, "q": "Which command lists USB devices connected to the system?", "o": ["lspci", "lsusb", "lsblk", "dmesg"], "c": 1, "e": "lsusb enumerates devices on the USB buses."}, {"t": 4, "q": "Which command attaches a file system to a directory (mount point) in the tree?", "o": ["mount", "fsck", "df", "mkfs"], "c": 0, "e": "mount makes a filesystem available at a mount point; umount detaches it."}, {"t": 4, "q": "Which file describes file systems to be mounted, often at boot time?", "o": ["/etc/mtab", "/etc/fstab", "/proc/mounts", "/etc/disks"], "c": 1, "e": "/etc/fstab lists filesystems and their mount options for boot-time and manual mounting."}, {"t": 4, "q": "What does RAM provide in a computer?", "o": ["Permanent storage that survives power off", "Fast volatile working memory that is lost on power off", "Network connectivity", "Graphics acceleration only"], "c": 1, "e": "RAM is volatile working memory; its contents are lost when power is removed."}, {"t": 4, "q": "Which command shows a real-time, continuously updating view of running processes and resource usage?", "o": ["ps", "top", "jobs", "uptime"], "c": 1, "e": "top provides a dynamic, real-time process viewer. ps takes a one-time snapshot."}, {"t": 4, "q": "Which command takes a one-time snapshot of currently running processes?", "o": ["top", "ps", "htop", "free"], "c": 1, "e": "ps prints a snapshot of processes; e.g., 'ps aux'."}, {"t": 4, "q": "Which command displays the system's IP addresses on modern Linux?", "o": ["ip addr show", "ipconfig", "netstat -i only", "host"], "c": 0, "e": "'ip addr show' (iproute2) displays interface addresses; ifconfig is the older tool."}, {"t": 4, "q": "Which legacy command displays/configures network interfaces (now largely replaced by 'ip')?", "o": ["route", "ifconfig", "ping", "ss"], "c": 1, "e": "ifconfig is the deprecated tool replaced by 'ip addr'. route is replaced by 'ip route'."}, {"t": 4, "q": "Which command tests basic connectivity to another host by sending ICMP echo requests?", "o": ["traceroute", "ping", "dig", "ip"], "c": 1, "e": "ping sends ICMP echo requests to test reachability and round-trip time."}, {"t": 4, "q": "Which command shows the kernel routing table on modern systems?", "o": ["ip route show", "ping -r", "ifconfig -a", "lsblk"], "c": 0, "e": "'ip route show' (or 'route') displays the routing table."}, {"t": 4, "q": "Which file maps hostnames to IP addresses locally, consulted before DNS in typical configurations?", "o": ["/etc/resolv.conf", "/etc/hosts", "/etc/hostname", "/etc/networks"], "c": 1, "e": "/etc/hosts provides static hostname-to-IP mappings checked locally."}, {"t": 4, "q": "Which file specifies the DNS name servers the resolver should query?", "o": ["/etc/hosts", "/etc/resolv.conf", "/etc/nsswitch.conf", "/etc/hostname"], "c": 1, "e": "/etc/resolv.conf lists nameserver entries used for DNS resolution."}, {"t": 4, "q": "What does DNS do?", "o": ["Assigns IP addresses via DHCP", "Resolves human-readable names to IP addresses", "Encrypts web traffic", "Routes packets between networks"], "c": 1, "e": "The Domain Name System translates domain names (e.g., example.com) into IP addresses."}, {"t": 4, "q": "An IPv4 address consists of how many bits?", "o": ["16", "32", "48", "128"], "c": 1, "e": "IPv4 addresses are 32 bits (four 8-bit octets). IPv6 is 128 bits."}, {"t": 4, "q": "An IPv6 address consists of how many bits?", "o": ["32", "64", "128", "256"], "c": 2, "e": "IPv6 addresses are 128 bits long, allowing a vastly larger address space than IPv4."}, {"t": 4, "q": "A device that forwards packets between different networks is called a:", "o": ["Switch", "Router", "Hub", "Repeater"], "c": 1, "e": "A router connects and forwards traffic between separate networks (link-layer 'islands')."}, {"t": 4, "q": "On an Ethernet network, hardware interfaces are identified at the link layer by a:", "o": ["IP address", "MAC address", "Port number", "Hostname"], "c": 1, "e": "MAC (Media Access Control) addresses are 48-bit link-layer identifiers for Ethernet devices."}, {"t": 4, "q": "Which command prints the system's host name?", "o": ["whoami", "hostname", "uname -h", "id"], "c": 1, "e": "hostname prints (or sets) the system's network host name."}, {"t": 4, "q": "Which command displays kernel and system information such as the kernel version (uname -r)?", "o": ["uname", "hostname", "lscpu", "dmesg"], "c": 0, "e": "uname prints system info; uname -r shows the kernel release."}, {"t": 4, "q": "Which protocol automatically assigns IP configuration to clients on a network?", "o": ["DNS", "DHCP", "HTTP", "SSH"], "c": 1, "e": "DHCP (Dynamic Host Configuration Protocol) auto-assigns IP addresses and related settings."}, {"t": 4, "q": "When choosing an operating system, which is a typical advantage of Linux cited in the objectives?", "o": ["It cannot run servers", "It is open source, flexible, and widely used for servers, cloud and embedded systems", "It only runs on mainframes", "It has no command line"], "c": 1, "e": "Linux is valued for being open source, flexible, and dominant in servers, cloud and embedded contexts."}, {"t": 4, "q": "Which storage type is non-volatile (retains data without power)?", "o": ["RAM", "CPU cache", "An SSD or hard disk", "Registers"], "c": 2, "e": "SSDs and hard disks retain data without power; RAM, cache and registers are volatile."}, {"t": 5, "q": "Which file stores basic user account information (but not the encrypted password in modern systems)?", "o": ["/etc/shadow", "/etc/passwd", "/etc/group", "/etc/sudoers"], "c": 1, "e": "/etc/passwd holds account info (username, UID, GID, home, shell). Passwords live in /etc/shadow."}, {"t": 5, "q": "Which file stores the encrypted (hashed) user passwords and is readable only by root?", "o": ["/etc/passwd", "/etc/shadow", "/etc/group", "/etc/login.defs"], "c": 1, "e": "/etc/shadow stores password hashes and aging info, protected from normal users."}, {"t": 5, "q": "Which file defines groups and their members?", "o": ["/etc/passwd", "/etc/group", "/etc/shadow", "/etc/hosts"], "c": 1, "e": "/etc/group lists group names, GIDs and member lists."}, {"t": 5, "q": "What is the User ID (UID) of the root account?", "o": ["1", "100", "0", "1000"], "c": 2, "e": "root always has UID 0, which grants full administrative privileges."}, {"t": 5, "q": "On many modern distributions, regular (human) user accounts typically start at which UID?", "o": ["0", "1", "500 or 1000", "65534"], "c": 2, "e": "Normal user UIDs usually begin at 1000 (or 500 on some older systems); below that are system accounts."}, {"t": 5, "q": "Which command prints the current user's UID, GID and group memberships?", "o": ["who", "id", "whoami", "groups only"], "c": 1, "e": "id shows UID, GID and supplementary groups. whoami prints just the username."}, {"t": 5, "q": "Which command simply prints the username of the current user?", "o": ["id", "whoami", "users", "w"], "c": 1, "e": "whoami prints the effective username."}, {"t": 5, "q": "Which command lists the users currently logged in, plus what each is doing?", "o": ["who", "w", "last", "id"], "c": 1, "e": "w shows logged-in users and their current activity (an extended 'who'). The TTY column identifies the session."}, {"t": 5, "q": "Which command shows a history of recent user logins, reading from the wtmp log?", "o": ["who", "w", "last", "id"], "c": 2, "e": "last reports recent logins/logouts from the wtmp records."}, {"t": 5, "q": "Which command allows a permitted user to run a single command with elevated (root) privileges?", "o": ["su", "sudo", "runas", "pkexec only"], "c": 1, "e": "sudo runs a command as another user (root by default) per /etc/sudoers policy."}, {"t": 5, "q": "Which command switches to another user account, starting a new shell (root if no user given)?", "o": ["sudo", "su", "login only", "chsh"], "c": 1, "e": "su (substitute user) opens a shell as another user; 'su -' loads that user's environment."}, {"t": 5, "q": "Which command creates a new user account?", "o": ["mkuser", "useradd", "newuser", "adduser is the only option"], "c": 1, "e": "useradd creates a user account (adduser is a friendlier front-end on some distros)."}, {"t": 5, "q": "Which command creates a new group?", "o": ["addgroup only", "groupadd", "newgrp", "mkgroup"], "c": 1, "e": "groupadd creates a new group."}, {"t": 5, "q": "Which command sets or changes a user's password?", "o": ["chpass", "passwd", "setpass", "pwd"], "c": 1, "e": "passwd changes a password. (pwd prints the working directory — unrelated.)"}, {"t": 5, "q": "Which directory's contents are copied into a new user's home directory as a template?", "o": ["/etc/skel", "/etc/default", "/home/template", "/usr/skel"], "c": 0, "e": "/etc/skel holds skeleton files copied into each new user's home directory."}, {"t": 5, "q": "In the permission string 'rwxr-xr--', what are the permissions for the group?", "o": ["rwx", "r-x", "r--", "---"], "c": 1, "e": "Order is owner(rwx), group(r-x), others(r--). So group has read+execute (r-x)."}, {"t": 5, "q": "Which numeric (octal) mode corresponds to rwxr-xr-x?", "o": ["644", "755", "777", "750"], "c": 1, "e": "rwx=7, r-x=5, r-x=5 -> 755. (r=4, w=2, x=1.)"}, {"t": 5, "q": "Which numeric mode corresponds to rw-r--r--?", "o": ["755", "644", "640", "666"], "c": 1, "e": "rw-=6, r--=4, r--=4 -> 644."}, {"t": 5, "q": "Which command changes the permissions (mode) of a file?", "o": ["chown", "chmod", "chgrp", "umask"], "c": 1, "e": "chmod changes the mode/permissions. chown changes owner, chgrp changes group."}, {"t": 5, "q": "Which command changes the owner of a file?", "o": ["chmod", "chown", "chgrp", "passwd"], "c": 1, "e": "chown sets the file's owner (and optionally group with user:group syntax)."}, {"t": 5, "q": "Which command changes only the group ownership of a file?", "o": ["chgrp", "chmod", "chown -g", "newgrp"], "c": 0, "e": "chgrp changes the group owner; chown user:group can do both at once."}, {"t": 5, "q": "Which chmod expression adds execute permission for the file's owner using symbolic mode?", "o": ["chmod o+x file", "chmod u+x file", "chmod a+x file", "chmod g+x file"], "c": 1, "e": "u = user/owner, g = group, o = others, a = all. u+x adds execute for the owner."}, {"t": 5, "q": "What does the umask value influence?", "o": ["The maximum file size", "The default permissions removed from new files and directories", "The owner of new files", "The disk quota"], "c": 1, "e": "umask masks (removes) permission bits from the defaults when files/directories are created."}, {"t": 5, "q": "With a typical umask of 022, what default permissions does a new directory receive?", "o": ["777", "755", "700", "644"], "c": 1, "e": "Directories start from 777; removing 022 leaves 755 (rwxr-xr-x)."}, {"t": 5, "q": "With a typical umask of 022, what default permissions does a new regular file receive?", "o": ["666", "644", "755", "600"], "c": 1, "e": "Files start from 666; removing 022 leaves 644 (rw-r--r--). (Execute is not granted by default.)"}, {"t": 5, "q": "On a directory, what does the execute (x) permission allow?", "o": ["Running the directory as a program", "Entering the directory and accessing its entries", "Listing file names", "Deleting the directory"], "c": 1, "e": "x on a directory permits 'traversal' — accessing files within it (cd into it / access by name)."}, {"t": 5, "q": "The sticky bit is most famously set on which directory so users can only delete their own files?", "o": ["/etc", "/tmp", "/home", "/bin"], "c": 1, "e": "/tmp has the sticky bit so users can create files but only delete the ones they own."}, {"t": 5, "q": "In 'ls -l', a 't' in the others-execute position of a directory indicates:", "o": ["The setuid bit", "The setgid bit", "The sticky bit", "A symbolic link"], "c": 2, "e": "A 't' in the last position shows the sticky bit, common on shared directories like /tmp."}, {"t": 5, "q": "What does the setuid (SUID) bit do when set on an executable file?", "o": ["Runs it with the permissions of the file's owner", "Prevents deletion", "Makes it read-only", "Hides the file"], "c": 0, "e": "SUID makes the program run with the file owner's privileges (e.g., /usr/bin/passwd runs as root)."}, {"t": 5, "q": "The setgid bit on a directory causes new files created in it to:", "o": ["Be owned by root", "Inherit the directory's group", "Be executable", "Be hidden"], "c": 1, "e": "setgid on a directory makes new entries inherit the directory's group ownership."}, {"t": 5, "q": "Which symbolic chmod removes write permission for group and others?", "o": ["chmod go-w file", "chmod ug-w file", "chmod a+w file", "chmod o+w file"], "c": 0, "e": "go-w removes (-) write (w) from group (g) and others (o)."}, {"t": 5, "q": "A 'system user' (service account) is best described as:", "o": ["Any user with UID 0", "A non-login account used to run services/daemons, usually with a low UID", "A user in the sudo group", "A temporary guest account"], "c": 1, "e": "System users run daemons/services; they typically have low UIDs and no interactive login shell."}, {"t": 5, "q": "Which file commonly controls which users/groups may use sudo and what they may run?", "o": ["/etc/passwd", "/etc/sudoers", "/etc/shadow", "/etc/group"], "c": 1, "e": "/etc/sudoers (edited with visudo) defines sudo privileges."}, {"t": 5, "q": "A hard link and the original file:", "o": ["Point to different inodes", "Share the same inode and data on the same filesystem", "Can span different filesystems", "Are the same as a shortcut on Windows"], "c": 1, "e": "Hard links share the same inode; they reference the same data and must be on the same filesystem."}, {"t": 5, "q": "A symbolic (soft) link differs from a hard link in that it:", "o": ["Cannot be deleted", "Is a separate file pointing to a path, and can cross filesystems", "Shares the same inode", "Only works for directories"], "c": 1, "e": "A symlink stores a path to its target, can cross filesystems, and breaks if the target is removed."}, {"t": 5, "q": "Which command creates a symbolic link named 'link' to target 'file'?", "o": ["ln file link", "ln -s file link", "link file link", "cp -s file link"], "c": 1, "e": "ln -s target linkname creates a symbolic link; without -s it makes a hard link."}, {"t": 5, "q": "Why is logging in directly as root for everyday work discouraged?", "o": ["root cannot use the GUI", "A mistake or compromised session has unrestricted, system-wide impact", "root cannot run scripts", "It disables networking"], "c": 1, "e": "Using sudo for specific tasks limits risk; full root sessions make errors and breaches far more damaging."}, {"t": 5, "q": "Which command would display the groups that the current user belongs to?", "o": ["groups", "grouplist", "id -G only works for numbers", "members"], "c": 0, "e": "groups prints the group memberships of the user; id also shows them."}];
+</script>
+<script>
+/* LPI Linux Essentials — Practice (instant feedback). Vanilla JS, no deps. */
+"use strict";
+
+const TOPIC_NAMES = {
+  1: "The Linux Community & Career in Open Source",
+  2: "Finding Your Way on a Linux System",
+  3: "The Power of the Command Line",
+  4: "The Linux Operating System",
+  5: "Security & File Permissions",
+};
+const TOPIC_SHORT = {
+  1: "Community / Open Source",
+  2: "Finding Your Way",
+  3: "Command Line",
+  4: "Operating System",
+  5: "Security & Permissions",
+};
+const EXAM_WEIGHT = { 1: 7, 2: 9, 3: 9, 4: 8, 5: 7 };
+const PASS = 0.66;
+
+const state = {
+  topics: new Set([1, 2, 3, 4, 5]),
+  count: 40,           // 10 | 20 | 40 | "all"
+  session: null,       // { items:[], idx, answers:[], started }
+};
+
+const app = document.getElementById("app");
+const $ = (sel, root = document) => root.querySelector(sel);
+
+/* ---------- utilities ---------- */
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function poolFor(topics) {
+  return QUESTIONS.filter((q) => topics.has(q.t));
+}
+
+function prepare(q) {
+  // clone, shuffle options, recompute correct index by tracking the correct text
+  const correctText = q.o[q.c];
+  const opts = shuffle(q.o);
+  return { t: q.t, q: q.q, opts, correct: opts.indexOf(correctText), e: q.e };
+}
+
+function buildSession() {
+  const topics = state.topics;
+  const weighted = state.count === 40 && topics.size === 5;
+  let chosen = [];
+  if (weighted) {
+    for (const t of [1, 2, 3, 4, 5]) {
+      const pool = shuffle(QUESTIONS.filter((q) => q.t === t));
+      chosen = chosen.concat(pool.slice(0, EXAM_WEIGHT[t]));
+    }
+    chosen = shuffle(chosen); // mix topics within the set; topic groups not required in practice
+  } else {
+    const pool = shuffle(poolFor(topics));
+    const n = state.count === "all" ? pool.length : Math.min(state.count, pool.length);
+    chosen = pool.slice(0, n);
+  }
+  return {
+    items: chosen.map(prepare),
+    idx: 0,
+    answers: new Array(chosen.length).fill(null),
+    started: Date.now(),
+  };
+}
+
+function fmtTime(ms) {
+  const s = Math.floor(ms / 1000);
+  const m = Math.floor(s / 60);
+  return `${String(m).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+}
+
+/* ---------- config screen ---------- */
+function renderConfig() {
+  const counts = QUESTIONS.reduce((m, q) => ((m[q.t] = (m[q.t] || 0) + 1), m), {});
+  const total = QUESTIONS.length;
+  const avail = poolFor(state.topics).length;
+  const weighted = state.count === 40 && state.topics.size === 5;
+
+  const topicRows = [1, 2, 3, 4, 5]
+    .map(
+      (t) => `
+      <label class="topic ${state.topics.has(t) ? "on" : ""}" data-topic="${t}">
+        <span class="chk" aria-hidden="true">${state.topics.has(t) ? "[x]" : "[ ]"}</span>
+        <span class="tnum tcol${t}">T${t}</span>
+        <span class="tname">${TOPIC_NAMES[t]}</span>
+        <span class="tcount">${counts[t]}</span>
+      </label>`
+    )
+    .join("");
+
+  const lenBtn = (val, label) =>
+    `<button class="seg ${String(state.count) === String(val) ? "on" : ""}" data-count="${val}">${label}</button>`;
+
+  app.innerHTML = `
+    <section class="card reveal">
+      <div class="prompt"><span class="usr">student@linux</span><span class="sep">:</span><span class="dir">~/study</span><span class="dollar">$</span>
+        <span class="cmd">lpi-essentials --practice<span class="cursor"></span></span></div>
+      <p class="lede">Practice mode with instant feedback. ${total} questions in the bank, randomized fresh each run.
+      Pick a topic set and length, then hit start.</p>
+
+      <h2 class="lbl">// topics</h2>
+      <div class="topics">${topicRows}</div>
+      <div class="topicbtns">
+        <button class="mini" id="allTopics">select all</button>
+        <button class="mini" id="noTopics">clear</button>
+      </div>
+
+      <h2 class="lbl">// length</h2>
+      <div class="segs">
+        ${lenBtn(10, "10")}
+        ${lenBtn(20, "20")}
+        ${lenBtn(40, "40 · exam")}
+        ${lenBtn("all", "all")}
+      </div>
+
+      <div class="meta">
+        <span><b>${avail}</b> questions available in selection</span>
+        <span class="${weighted ? "wgt on" : "wgt"}">${weighted ? "✓ weighted 7/9/9/8/7 (mirrors real exam)" : "random sample"}</span>
+      </div>
+
+      <button class="start" id="startBtn" ${avail === 0 ? "disabled" : ""}>
+        ${avail === 0 ? "select at least one topic" : "▸ start practice"}
+      </button>
+      <p class="hint">tip: answer with keys <kbd>1</kbd>–<kbd>4</kbd> or <kbd>A</kbd>–<kbd>D</kbd>, advance with <kbd>Enter</kbd>.</p>
+    </section>`;
+
+  app.querySelectorAll(".topic").forEach((el) =>
+    el.addEventListener("click", () => {
+      const t = Number(el.dataset.topic);
+      if (state.topics.has(t)) state.topics.delete(t);
+      else state.topics.add(t);
+      renderConfig();
+    })
+  );
+  $("#allTopics").addEventListener("click", () => { state.topics = new Set([1, 2, 3, 4, 5]); renderConfig(); });
+  $("#noTopics").addEventListener("click", () => { state.topics = new Set(); renderConfig(); });
+  app.querySelectorAll(".seg").forEach((el) =>
+    el.addEventListener("click", () => {
+      const v = el.dataset.count;
+      state.count = v === "all" ? "all" : Number(v);
+      renderConfig();
+    })
+  );
+  const sb = $("#startBtn");
+  if (avail > 0) sb.addEventListener("click", startSession);
+}
+
+/* ---------- quiz screen ---------- */
+function startSession() {
+  state.session = buildSession();
+  renderQuiz();
+}
+
+function renderQuiz() {
+  const s = state.session;
+  const item = s.items[s.idx];
+  const answered = s.answers[s.idx] !== null;
+  const correctSoFar = s.answers.filter((a) => a && a.correct).length;
+  const doneSoFar = s.answers.filter((a) => a !== null).length;
+  const pct = Math.round(((s.idx) / s.items.length) * 100);
+
+  const optBtns = item.opts
+    .map((o, i) => {
+      let cls = "opt";
+      if (answered) {
+        if (i === item.correct) cls += " correct";
+        else if (i === s.answers[s.idx].pick) cls += " wrong";
+        else cls += " dim";
+      }
+      return `<button class="${cls}" data-i="${i}" ${answered ? "disabled" : ""}>
+        <span class="letter">${String.fromCharCode(65 + i)}</span><span class="otext">${o}</span></button>`;
+    })
+    .join("");
+
+  let feedback = "";
+  if (answered) {
+    const a = s.answers[s.idx];
+    feedback = `
+      <div class="fb ${a.correct ? "ok" : "no"}">
+        <div class="fbhead">${a.correct ? "✓ correct" : "✗ incorrect"}${
+          a.correct ? "" : ` — answer: <b>${String.fromCharCode(65 + item.correct)}</b>`
+        }</div>
+        <div class="fbbody">${item.e}</div>
+      </div>`;
+  }
+
+  app.innerHTML = `
+    <section class="card quiz">
+      <div class="topbar">
+        <span class="badge tcol${item.t}">T${item.t} · ${TOPIC_SHORT[item.t]}</span>
+        <span class="counter">Q ${s.idx + 1}<span class="of">/${s.items.length}</span></span>
+        <span class="score">${correctSoFar}<span class="of">/${doneSoFar}</span> correct</span>
+        <span class="timer" id="timer">00:00</span>
+      </div>
+      <div class="bar"><span style="width:${pct}%"></span></div>
+
+      <h2 class="qtext">${item.q}</h2>
+      <div class="opts">${optBtns}</div>
+      ${feedback}
+
+      <div class="navrow">
+        <button class="ghost" id="quitBtn">⏏ end &amp; score</button>
+        <button class="next" id="nextBtn" ${answered ? "" : "disabled"}>
+          ${s.idx === s.items.length - 1 ? "see results ▸" : "next ▸"}
+        </button>
+      </div>
+    </section>`;
+
+  app.querySelectorAll(".opt").forEach((el) =>
+    el.addEventListener("click", () => pick(Number(el.dataset.i)))
+  );
+  $("#nextBtn").addEventListener("click", next);
+  $("#quitBtn").addEventListener("click", finish);
+  if (answered) $("#nextBtn").focus();
+  startTimer();
+}
+
+let timerHandle = null;
+function startTimer() {
+  if (timerHandle) clearInterval(timerHandle);
+  const el = document.getElementById("timer");
+  const tick = () => { if (el && state.session) el.textContent = fmtTime(Date.now() - state.session.started); };
+  tick();
+  timerHandle = setInterval(tick, 1000);
+}
+
+function pick(i) {
+  const s = state.session;
+  if (s.answers[s.idx] !== null) return;
+  const item = s.items[s.idx];
+  s.answers[s.idx] = { pick: i, correct: i === item.correct };
+  renderQuiz();
+}
+
+function next() {
+  const s = state.session;
+  if (s.answers[s.idx] === null) return;
+  if (s.idx < s.items.length - 1) { s.idx++; renderQuiz(); }
+  else finish();
+}
+
+/* ---------- results ---------- */
+function finish() {
+  if (timerHandle) clearInterval(timerHandle);
+  const s = state.session;
+  const answered = s.answers.filter((a) => a !== null);
+  const correct = answered.filter((a) => a.correct).length;
+  const acc = answered.length ? correct / answered.length : 0;
+  const pass = acc >= PASS;
+  const elapsed = fmtTime(Date.now() - s.started);
+
+  // per-topic
+  const byTopic = {};
+  s.items.forEach((it, i) => {
+    const a = s.answers[i];
+    if (a === null) return;
+    byTopic[it.t] = byTopic[it.t] || { c: 0, n: 0 };
+    byTopic[it.t].n++;
+    if (a.correct) byTopic[it.t].c++;
+  });
+  const topicBars = Object.keys(byTopic)
+    .sort()
+    .map((t) => {
+      const { c, n } = byTopic[t];
+      const p = Math.round((c / n) * 100);
+      return `<div class="trow">
+        <span class="tlab tcol${t}">T${t} ${TOPIC_SHORT[t]}</span>
+        <span class="tbar"><span class="tfill tcol${t}bg" style="width:${p}%"></span></span>
+        <span class="tval">${c}/${n}</span>
+      </div>`;
+    })
+    .join("");
+
+  app.innerHTML = `
+    <section class="card results reveal">
+      <div class="verdict ${pass ? "pass" : "fail"}">${pass ? "PASS" : "BELOW PASS"}</div>
+      <div class="bigscore">${correct}<span class="bsof">/${answered.length}</span></div>
+      <div class="acc">${Math.round(acc * 100)}% &nbsp;·&nbsp; pass mark ≈ ${Math.round(PASS * 100)}% &nbsp;·&nbsp; time ${elapsed}</div>
+
+      <h2 class="lbl">// by topic</h2>
+      <div class="topicbreak">${topicBars}</div>
+
+      <div class="navrow center">
+        <button class="ghost" id="reviewBtn">review answers</button>
+        <button class="ghost" id="reviewWrongBtn">review incorrect</button>
+        <button class="next" id="againBtn">▸ new set</button>
+        <button class="ghost" id="cfgBtn">change settings</button>
+      </div>
+    </section>`;
+
+  $("#reviewBtn").addEventListener("click", () => renderReview(false));
+  $("#reviewWrongBtn").addEventListener("click", () => renderReview(true));
+  $("#againBtn").addEventListener("click", startSession);
+  $("#cfgBtn").addEventListener("click", () => { state.session = null; renderConfig(); });
+}
+
+/* ---------- review ---------- */
+function renderReview(onlyWrong) {
+  const s = state.session;
+  const rows = [];
+  s.items.forEach((it, i) => {
+    const a = s.answers[i];
+    const isWrong = !a || !a.correct;
+    if (onlyWrong && !isWrong) return;
+    const opts = it.opts
+      .map((o, oi) => {
+        let cls = "ropt";
+        if (oi === it.correct) cls += " rcorrect";
+        if (a && oi === a.pick && !a.correct) cls += " rwrong";
+        return `<div class="${cls}"><span class="letter">${String.fromCharCode(65 + oi)}</span>${o}</div>`;
+      })
+      .join("");
+    rows.push(`
+      <div class="rcard ${isWrong ? "isw" : "isok"}">
+        <div class="rhead"><span class="badge tcol${it.t}">T${it.t}</span>
+          <span class="rmark">${a && a.correct ? "✓" : (a ? "✗" : "—")}</span>
+          <span class="rq">${it.q}</span></div>
+        <div class="ropts">${opts}</div>
+        <div class="rexp">${it.e}</div>
+      </div>`);
+  });
+  if (rows.length === 0) rows.push(`<p class="empty">Nothing to show — every answer was correct. 🎉</p>`);
+
+  app.innerHTML = `
+    <section class="card review reveal">
+      <div class="topbar">
+        <span class="badge">review ${onlyWrong ? "· incorrect only" : "· all"}</span>
+        <span class="counter">${rows.length} item(s)</span>
+      </div>
+      <div class="rlist">${rows.join("")}</div>
+      <div class="navrow center">
+        <button class="ghost" id="backRes">◂ back to results</button>
+        <button class="next" id="againBtn2">▸ new set</button>
+      </div>
+    </section>`;
+  $("#backRes").addEventListener("click", finish);
+  $("#againBtn2").addEventListener("click", startSession);
+}
+
+/* ---------- keyboard ---------- */
+document.addEventListener("keydown", (e) => {
+  if (!state.session) return;
+  const onQuiz = $(".quiz");
+  if (!onQuiz) return;
+  const s = state.session;
+  const answered = s.answers[s.idx] !== null;
+  const k = e.key.toLowerCase();
+  if (!answered) {
+    let idx = -1;
+    if (["1", "2", "3", "4"].includes(k)) idx = Number(k) - 1;
+    else if (["a", "b", "c", "d"].includes(k)) idx = k.charCodeAt(0) - 97;
+    if (idx >= 0 && idx < s.items[s.idx].opts.length) { e.preventDefault(); pick(idx); }
+  } else if (k === "enter" || k === "n" || k === " ") {
+    e.preventDefault(); next();
+  }
+});
+
+/* ---------- boot ---------- */
+renderConfig();
+
+</script>
+</body>
+</html>
